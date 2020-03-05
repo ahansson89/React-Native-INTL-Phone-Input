@@ -33,7 +33,7 @@ export default class IntlPhoneInput extends React.Component {
     const { dialCode, mask } = this.state;
     const countOfNumber = mask.match(/9/g).length;
     if (this.props.onChangeText) {
-      const isVerified = countOfNumber === unmaskedPhoneNumber.length && phoneNumber.length > 0;
+      const isVerified = countOfNumber === unmaskedPhoneNumber?.length && phoneNumber?.length > 0;
       this.props.onChangeText({
         dialCode, unmaskedPhoneNumber, phoneNumber, isVerified
       });
@@ -62,14 +62,18 @@ export default class IntlPhoneInput extends React.Component {
       }
     }
     phoneNumber = phoneNumber.slice(0, numberPointer + 1);
-    unmaskedPhoneNumber = phoneNumber.match(/9/g).length;
+    unmaskedPhoneNumber = (phoneNumber.match(/\d+/g) || []).join('');
 
     this.onChangePropText(unmaskedPhoneNumber, phoneNumber);
     this.setState({ phoneNumber });
   }
 
 
-  showModal = () => this.props.disableCountryChange?this.setState({ modalVisible: true }):null;
+  showModal = () => {
+    if(!this.props.disableCountryChange) {
+      this.setState({ modalVisible: true })
+    }
+  }
 
   hideModal = () => this.setState({ modalVisible: false });
 
@@ -190,6 +194,7 @@ IntlPhoneInput.propTypes = {
   filterText: PropTypes.string,
   closeText: PropTypes.string,
   searchIconStyle: PropTypes.object,
+  disableCountryChange:PropTypes.booleanValue
 };
 
 const styles = StyleSheet.create({
