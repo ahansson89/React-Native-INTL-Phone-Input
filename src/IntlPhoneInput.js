@@ -69,11 +69,8 @@ export default class IntlPhoneInput extends React.Component {
   }
 
 
-  showModal = () => {
-    if(!this.props.disableCountryChange) {
-      this.setState({ modalVisible: true })
-    }
-  }
+  showModal = () => this.setState({ modalVisible: true });
+
 
   hideModal = () => this.setState({ modalVisible: false });
 
@@ -121,10 +118,12 @@ export default class IntlPhoneInput extends React.Component {
       filterText,
       searchIconStyle,
       closeButtonStyle,
-      inputProps
+      inputProps,
+      disableCountryChange,
+      style
     } = this.props;
     return (
-        <View style={{ ...styles.container, ...containerStyle }}>
+        <View style={[{ ...styles.container, ...containerStyle }, ...style]}>
           <TouchableOpacity onPress={() => this.showModal()}>
             <View style={styles.openDialogView}>
               <Text style={[styles.flagStyle, flagStyle]}>{flag}</Text>
@@ -142,40 +141,40 @@ export default class IntlPhoneInput extends React.Component {
               value={this.state.phoneNumber}
               onChangeText={this.onChangeText}
           />
-          <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}>
-            <SafeAreaView style={{ flex: 1 }}>
-              <View style={[styles.modalContainer, modalContainer]}>
-                <View style={styles.filterInputStyleContainer}>
-                  <TextInput autoCompleteType={false} onChangeText={this.filterCountries} placeholder={filterText || 'Filter'} style={[styles.filterInputStyle, filterInputStyle]} />
-                  <Text style={[styles.searchIconStyle, searchIconStyle]}>🔍</Text>
-                </View>
-                <FlatList
-                    style={{ flex: 1 }}
-                    data={this.state.countryData}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={
-                      ({ item }) => (
-                          <TouchableWithoutFeedback onPress={() => this.onCountryChange(item.name)}>
-                            <View style={[styles.countryModalStyle, countryModalStyle]}>
-                              <Text style={[styles.modalFlagStyle, modalFlagStyle]}>{item.flag}</Text>
-                              <View style={styles.modalCountryItemContainer}>
-                                <Text style={[styles.modalCountryItemCountryNameStyle, modalCountryItemCountryNameStyle]}>{item.name}</Text>
-                                <Text style={[styles.modalCountryItemCountryDialCodeStyle, modalCountryItemCountryDialCodeStyle]}>{`  ${item.dialCode}`}</Text>
+          {!disableCountryChange &&
+            <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}>
+              <SafeAreaView style={{ flex: 1 }}>
+                <View style={[styles.modalContainer, modalContainer]}>
+                  <View style={styles.filterInputStyleContainer}>
+                    <TextInput autoCompleteType="off" onChangeText={this.filterCountries} placeholder={filterText || 'Filter'} style={[styles.filterInputStyle, filterInputStyle]} />
+                    <Text style={[styles.searchIconStyle, searchIconStyle]}>🔍</Text>
+                  </View>
+                  <FlatList
+                      style={{ flex: 1 }}
+                      data={this.state.countryData}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={
+                        ({ item }) => (
+                            <TouchableWithoutFeedback onPress={() => this.onCountryChange(item.name)}>
+                              <View style={[styles.countryModalStyle, countryModalStyle]}>
+                                <Text style={[styles.modalFlagStyle, modalFlagStyle]}>{item.flag}</Text>
+                                <View style={styles.modalCountryItemContainer}>
+                                  <Text style={[styles.modalCountryItemCountryNameStyle, modalCountryItemCountryNameStyle]}>{item.name}</Text>
+                                  <Text style={[styles.modalCountryItemCountryDialCodeStyle, modalCountryItemCountryDialCodeStyle]}>{`  ${item.dialCode}`}</Text>
+                                </View>
                               </View>
-                            </View>
-                          </TouchableWithoutFeedback>
-                      )
-                    }
-                />
-              </View>
-              <TouchableOpacity onPress={() => this.hideModal()} style={[styles.closeButtonStyle, closeButtonStyle]}>
-                <Text style={styles.closeTextStyle}>{closeText || 'CLOSE'}</Text>
-              </TouchableOpacity>
-            </SafeAreaView>
-          </Modal>
+                            </TouchableWithoutFeedback>
+                        )
+                      }
+                  />
+                </View>
+                <TouchableOpacity onPress={() => this.hideModal()} style={[styles.closeButtonStyle, closeButtonStyle]}>
+                  <Text style={styles.closeTextStyle}>{closeText || 'CLOSE'}</Text>
+                </TouchableOpacity>
+              </SafeAreaView>
+            </Modal>
+          }
         </View>
-
-
     );
   }
 }
@@ -194,7 +193,7 @@ IntlPhoneInput.propTypes = {
   filterText: PropTypes.string,
   closeText: PropTypes.string,
   searchIconStyle: PropTypes.object,
-  disableCountryChange:PropTypes.booleanValue
+  disableCountryChange:PropTypes.bool
 };
 
 const styles = StyleSheet.create({
